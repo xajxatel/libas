@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "216211367600",
+    "project_id": "narada-ai",
+    "storage_bucket": "narada-ai.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:216211367600:android:d6dade7d4d18a5b312bd75",
+        "android_client_info": {
+          "package_name": "com.xajxatel.closetly"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBsZDN5TjBieoRtRIcNDBfjkSK4wKs-Aek"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
