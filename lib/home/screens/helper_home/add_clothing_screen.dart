@@ -30,7 +30,7 @@ class AddClothingScreen extends ConsumerStatefulWidget {
 }
 
 class _AddClothingScreenState extends ConsumerState<AddClothingScreen> {
-  final String apiKey = 'qghTy2TBMsUeJ2TzWrifosF3';
+  final String apiKey = 'ADD_YOUR_KEY';
   final ImagePicker _picker = ImagePicker();
   File? _selectedImage;
   bool _isProcessing = false;
