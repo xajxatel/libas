@@ -148,7 +148,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   Future<void> _fetchWeatherData(double lat, double lon) async {
     const apiKey =
-        '99811f84eb406787c2488c93210b3b65'; // Replace with your API key
+        'YOUR KEY'; // Replace with your API key
     final url =
         'https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&units=metric&appid=$apiKey';
 
