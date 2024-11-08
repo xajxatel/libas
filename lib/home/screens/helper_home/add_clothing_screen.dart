@@ -3,6 +3,7 @@ import 'package:closetly/home/widgets/loading_circle.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
@@ -266,27 +267,75 @@ class _AddClothingScreenState extends ConsumerState<AddClothingScreen> {
   }
 
   Future<void> _pickImage(ImageSource source) async {
-    final pickedFile = await _picker.pickImage(source: source);
-    if (pickedFile != null) {
-      setState(() {
-        _isProcessing = true;
-      });
+  final pickedFile = await _picker.pickImage(source: source);
+  if (pickedFile != null) {
+    setState(() {
+      _isProcessing = true;
+    });
 
-      // Ask the user if they want to remove the background
-      bool removeBackground = await _confirmRemoveBackground();
-      if (removeBackground) {
-        await _removeBackground(pickedFile.path);
-      } else {
+    // Optional: Ask the user if they want to remove the background
+    bool removeBackground = await _confirmRemoveBackground();
+    if (removeBackground) {
+      await _removeBackground(pickedFile.path);
+    } else {
+      // Proceed to crop the image before setting it
+      File? croppedFile = await _cropImage(pickedFile.path);
+      if (croppedFile != null) {
         setState(() {
-          _selectedImage = File(pickedFile.path);
+          _selectedImage = croppedFile;
         });
       }
-
-      setState(() {
-        _isProcessing = false;
-      });
     }
+
+    setState(() {
+      _isProcessing = false;
+    });
   }
+}
+Future<File?> _cropImage(String filePath, {bool isPortrait = false}) async {
+  try {
+    CroppedFile? croppedFile = await ImageCropper().cropImage(
+      sourcePath: filePath,
+      aspectRatio: 
+        CropAspectRatio(ratioX: 3, ratioY: 4) ,// Portrait ratio
+         
+      uiSettings: [
+        AndroidUiSettings(
+          toolbarTitle: 'Crop Image',
+          toolbarColor: Colors.transparent, // Transparent toolbar
+          toolbarWidgetColor: Colors.black, // Black text color
+          backgroundColor: Colors.transparent, // Transparent background
+          activeControlsWidgetColor: Colors.black, // Black for active controls
+          initAspectRatio: isPortrait 
+              ? CropAspectRatioPreset.ratio3x2 // Closest to 3:4
+              : CropAspectRatioPreset.square,
+          lockAspectRatio: true,
+          dimmedLayerColor: Colors.transparent, // Transparent dimmed layer
+          cropFrameColor: Colors.black, // Black crop frame for visibility
+          cropGridColor: Colors.transparent, // Transparent grid color
+        ),
+        IOSUiSettings(
+          title: 'Crop Image',
+          aspectRatioLockEnabled: true,
+          rotateButtonsHidden: true,
+          resetButtonHidden: true,
+          hidesNavigationBar: true, // Hides navigation bar on iOS
+          doneButtonTitle: 'Done',
+          cancelButtonTitle: 'Cancel',
+        ),
+      ],
+    );
+
+    if (croppedFile != null) {
+      return File(croppedFile.path);
+    } else {
+      // User canceled cropping
+      return null;
+    }
+  } catch (e) {
+    return null;
+  }
+}
 
   Future<bool> _confirmRemoveBackground() async {
     return await showDialog<bool>(

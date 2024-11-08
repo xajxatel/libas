@@ -175,8 +175,8 @@ class _CreateScreenState extends ConsumerState<CreateScreen>
                       return Opacity(
                         opacity: value,
                         child: Transform.translate(
-                          offset: Offset(50 * (1 - value),
-                              0), // Moves from right to original position
+                          offset:
+                              Offset(50 * (1 - value), 0), // Moves from right to original position
                           child: child,
                         ),
                       );
@@ -185,9 +185,8 @@ class _CreateScreenState extends ConsumerState<CreateScreen>
                       label: Text(
                         category.toUpperCase(),
                         style: TextStyle(
-                          color: Colors.black,
-                          fontWeight:
-                              isSelected ? FontWeight.bold : FontWeight.normal,
+                          color: !isSelected ? Colors.black : Colors.pink, // Change label color based on selection
+                          fontWeight: FontWeight.normal,
                         ),
                       ),
                       selected: isSelected,
@@ -202,17 +201,20 @@ class _CreateScreenState extends ConsumerState<CreateScreen>
                           }
                         });
                       },
-                      shape: const RoundedRectangleBorder(
+                      shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.zero,
-                        side: BorderSide(color: Colors.black, width: 1.0),
+                        side: BorderSide(
+                            color: !isSelected ? Colors.black : Colors.pink, // Change border color based on selection
+                            width: 1.0),
                       ),
                       backgroundColor:
                           Colors.transparent, // Unselected background
-                      selectedColor: Colors.black12, // Selected background
+                      selectedColor: Colors.transparent, // Selected background remains transparent
                       showCheckmark: false,
                       padding: const EdgeInsets.symmetric(
                           horizontal: 4.0, vertical: 2.0),
-                      labelPadding: const EdgeInsets.symmetric(horizontal: 2.0),
+                      labelPadding:
+                          const EdgeInsets.symmetric(horizontal: 2.0),
                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
                   ),
@@ -310,48 +312,24 @@ class _CreateScreenState extends ConsumerState<CreateScreen>
                                                               category, item),
                                                       child: Container(
                                                         width: 120,
+                                                        margin: const EdgeInsets
+                                                            .only(left : 4 , right : 4), // Add space between item boxes
                                                         decoration:
                                                             BoxDecoration(
                                                           color: isSelected
                                                               ? Colors.black12
                                                               : Colors
                                                                   .transparent,
-                                                          border: Border(
-                                                            top:
-                                                                const BorderSide(
-                                                              color:
-                                                                  Colors.grey,
-                                                              width: 1.0,
-                                                            ),
-                                                            bottom:
-                                                                const BorderSide(
-                                                              color:
-                                                                  Colors.grey,
-                                                              width: 1.0,
-                                                            ),
-                                                            left: itemIndex == 0
-                                                                ? BorderSide
-                                                                    .none
-                                                                : const BorderSide(
-                                                                    color: Colors
-                                                                        .grey,
-                                                                    width: 1.0,
-                                                                  ),
-                                                            right: (itemIndex ==
-                                                                        items.length -
-                                                                            1 ||
-                                                                    (selectedItems[category] !=
-                                                                            null &&
-                                                                        !selectedItems[category]!.contains(items[itemIndex +
-                                                                            1])))
-                                                                ? const BorderSide(
-                                                                    color: Colors
-                                                                        .grey,
-                                                                    width: 1.0,
-                                                                  )
-                                                                : BorderSide
-                                                                    .none,
-                                                          ),
+                                                          border: isSelected
+                                                              ? Border.all(
+                                                                  color:
+                                                                      Colors.pink,
+                                                                  width: 1.0)
+                                                              : null, // Remove borders when not selected
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      0.0), // Optional: Rounded corners
                                                         ),
                                                         child: Stack(
                                                           children: [
@@ -367,13 +345,16 @@ class _CreateScreenState extends ConsumerState<CreateScreen>
                                                                         .infinity,
                                                                   )
                                                                 : Container(
-                                                                    color: Colors
+                                                                    color:
+                                                                        Colors
                                                                             .grey[
-                                                                        300],
-                                                                    width: double
-                                                                        .infinity,
-                                                                    height: double
-                                                                        .infinity,
+                                                                                300],
+                                                                    width:
+                                                                        double
+                                                                            .infinity,
+                                                                    height:
+                                                                        double
+                                                                            .infinity,
                                                                     child:
                                                                         const Icon(
                                                                       Icons
@@ -383,16 +364,7 @@ class _CreateScreenState extends ConsumerState<CreateScreen>
                                                                           .white,
                                                                     ),
                                                                   ),
-                                                            // Overlay to cover the image when selected
-                                                            if (isSelected)
-                                                              Container(
-                                                                color: Colors
-                                                                    .black12, // Apply the black12 overlay
-                                                                width: double
-                                                                    .infinity,
-                                                                height: double
-                                                                    .infinity,
-                                                              ),
+                                                            // Optional: Add overlay or other widgets if needed
                                                           ],
                                                         ),
                                                       ),
@@ -404,7 +376,8 @@ class _CreateScreenState extends ConsumerState<CreateScreen>
                                           ),
                                         );
                                       },
-                                      loading: () => const LoadingCircle(),
+                                      loading: () =>
+                                          const LoadingCircle(),
                                       error: (error, stack) => Text(
                                           'ERROR FETCHING ITEMS: ${error.toString()}'),
                                     );
@@ -417,7 +390,8 @@ class _CreateScreenState extends ConsumerState<CreateScreen>
                   ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
+            padding: const EdgeInsets.symmetric(
+                horizontal: 8.0, vertical: 6.0),
             child: Center(
               child: OutlinedButton(
                 onPressed: _createCollage,

@@ -196,12 +196,24 @@ class _CollageScreenState extends ConsumerState<CollageScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Step 1: Calculate totalItems and determine crossAxisCount
     int totalItems = itemOrder.fold(
-        0,
-        (count, category) =>
-            count + (widget.selectedItems[category]?.length ?? 0));
-    int crossAxisCount = 2;
-    int rowCount = (totalItems / crossAxisCount).ceil();
+      0,
+      (count, category) =>
+          count + (widget.selectedItems[category]?.length ?? 0),
+    );
+
+    int crossAxisCount;
+    if (totalItems >= 10) {
+      crossAxisCount = 4;
+    } else if (totalItems >= 5) {
+      crossAxisCount = 3;
+    } else if(totalItems>=2) {
+      crossAxisCount = 2;
+    }else{
+      crossAxisCount =1 ;
+    }
+
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
@@ -229,7 +241,7 @@ class _CollageScreenState extends ConsumerState<CollageScreen> {
                     controller: _outfitNameController,
                     decoration: _buildInputDecoration('Outfit Name',
                         hintText: 'Enter a name for this outfit'),
-                    cursorColor: Colors.black, // Set cursor color to grey
+                    cursorColor: Colors.black, // Set cursor color to black
                   ),
                 ),
                 const SizedBox(height: 12.0),
@@ -262,8 +274,9 @@ class _CollageScreenState extends ConsumerState<CollageScreen> {
                           borderRadius: BorderRadius.zero,
                           side: BorderSide(color: Colors.black, width: 1.0),
                         ),
-                        backgroundColor: Colors.transparent,
-                        selectedColor: Colors.black12,
+                        backgroundColor:
+                            Colors.transparent, // Unselected background
+                        selectedColor: Colors.black12, // Selected background
                         showCheckmark: false,
                         padding: const EdgeInsets.symmetric(
                             horizontal: 4.0, vertical: 2.0),
@@ -276,13 +289,15 @@ class _CollageScreenState extends ConsumerState<CollageScreen> {
                 ),
                 const SizedBox(height: 30.0),
 
+                // Updated GridView.builder with dynamic crossAxisCount
                 Expanded(
                   child: GridView.builder(
                     padding: EdgeInsets.zero,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: crossAxisCount, // Dynamic crossAxisCount
                       childAspectRatio: 0.75,
+                      crossAxisSpacing: 0, // Removed horizontal spacing
+                      mainAxisSpacing: 0.0, // Minimal vertical spacing
                     ),
                     itemCount: totalItems,
                     itemBuilder: (context, index) {
@@ -295,43 +310,67 @@ class _CollageScreenState extends ConsumerState<CollageScreen> {
                       final item = orderedItems[index];
                       final imageUrl = item['imageUrl'] ?? '';
 
+                      // Determine if the item is first or last in its row
                       int row = index ~/ crossAxisCount;
                       int column = index % crossAxisCount;
                       bool isFirstInRow = column == 0;
                       bool isLastInRow = column == crossAxisCount - 1;
+
+                      // Since all items in the collage are selected, set isSelected to true
+                      bool isSelected = true;
 
                       return Container(
                         decoration: BoxDecoration(
                           color: Colors.transparent,
                           border: Border(
                             top: const BorderSide(
-                                color: Colors.grey, width: 1.0),
+                                color: Colors.transparent, width: 1.0),
                             bottom: const BorderSide(
-                                color: Colors.grey, width: 1.0),
+                                color: Colors.transparent, width: 1.0),
                             left: isFirstInRow
                                 ? BorderSide.none
                                 : const BorderSide(
-                                    color: Colors.grey, width: 1.0),
+                                    color: Colors.transparent, width: 1.0),
                             right: isLastInRow
                                 ? BorderSide.none
                                 : const BorderSide(
-                                    color: Colors.grey, width: 1.0),
+                                    color: Colors.transparent, width: 1.0),
                           ),
                         ),
-                        child: imageUrl.isNotEmpty
-                            ? Image.network(
-                                imageUrl,
-                                fit: BoxFit.contain,
-                              )
-                            : Container(
-                                color: Colors.grey[300],
-                                child: const Icon(Icons.image,
-                                    size: 50, color: Colors.white),
+                        child: Stack(
+                          children: [
+                            // Display the image
+                            imageUrl.isNotEmpty
+                                ? Image.network(
+                                    imageUrl,
+                                    fit: BoxFit.contain,
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                  )
+                                : Container(
+                                    color: Colors.grey[300],
+                                    child: const Icon(
+                                      Icons.image,
+                                      size: 50,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                            // Overlay to cover the image when selected
+                            if (isSelected)
+                              Container(
+                                color: Colors
+                                    .transparent, // Apply the black12 overlay
+                                width: double.infinity,
+                                height: double.infinity,
                               ),
+                          ],
+                        ),
                       );
                     },
                   ),
                 ),
+
+                // SAVE Button
                 Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 8.0, vertical: 6.0),

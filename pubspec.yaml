@@ -53,6 +53,7 @@ dependencies:
   geolocator:
   permission_handler: 
   flutter_staggered_animations:
+  image_cropper:
 
   
 dev_dependencies:

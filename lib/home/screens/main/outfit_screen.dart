@@ -227,13 +227,13 @@ class _OutfitsScreenState extends ConsumerState<OutfitScreen> {
               color: Colors.transparent,
             ),
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(0.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Outfit Name
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 8.0),
+                    padding: const EdgeInsets.all(8),
                     child: Text(
                       outfit['outfitName'].toUpperCase(),
                       style: const TextStyle(
@@ -242,45 +242,81 @@ class _OutfitsScreenState extends ConsumerState<OutfitScreen> {
                       ),
                     ),
                   ),
-                  // Outfit Images in 2-column Grid
-                  GridView.builder(
-                    padding: EdgeInsets.zero,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 0.75,
-                    ),
-                    itemCount: (outfit['images'] as List<String>).length,
-                    itemBuilder: (context, imgIndex) {
-                      final imageUrl = outfit['images'][imgIndex];
-
-                      return Container(
-                        margin: const EdgeInsets.all(2.0), // Add margin between images
-                        color: Colors.white,
-                        child: imageUrl.isNotEmpty
-                            ? Image.network(
-                                imageUrl,
-                                fit: BoxFit.contain, // Adjust BoxFit for better coverage
-                              )
-                            : Container(
-                                color: Colors.grey[300],
-                                child: const Icon(
-                                  Icons.image,
-                                  size: 50,
-                                  color: Colors.white,
-                                ),
-                              ),
-                      );
-                    },
-                  ),
+                  // Outfit Images in Dynamic Grid
+                  _buildOutfitImagesGrid(outfit['images']),
                 ],
               ),
             ),
           ),
         ),
       ),
+    );
+  }
+
+  // New helper method to build dynamic grid based on number of images
+  Widget _buildOutfitImagesGrid(List<String> imageUrls) {
+    int totalImages = imageUrls.length;
+    int crossAxisCount;
+
+    if (totalImages >= 10) {
+      crossAxisCount = 4;
+    } else if (totalImages >= 5) {
+      crossAxisCount = 3;
+    } else if(totalImages>=2) {
+      crossAxisCount = 2;
+    }else{
+      crossAxisCount =1 ;
+    }
+
+    return GridView.builder(
+      padding: EdgeInsets.zero,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: crossAxisCount,
+        childAspectRatio: 0.75,
+        crossAxisSpacing: 4.0, // Adjust spacing as needed
+        mainAxisSpacing: 4.0,
+      ),
+      itemCount: totalImages,
+      itemBuilder: (context, imgIndex) {
+        final imageUrl = imageUrls[imgIndex];
+
+        // Determine if the item is first or last in its row
+        int row = imgIndex ~/ crossAxisCount;
+        int column = imgIndex % crossAxisCount;
+        bool isFirstInRow = column == 0;
+        bool isLastInRow = column == crossAxisCount - 1;
+
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.transparent,
+            border: Border(
+              top: const BorderSide(color: Colors.transparent, width: 1.0),
+              bottom: const BorderSide(color: Colors.transparent, width: 1.0),
+              left: isFirstInRow
+                  ? BorderSide.none
+                  : const BorderSide(color: Colors.transparent, width: 1.0),
+              right: isLastInRow
+                  ? BorderSide.none
+                  : const BorderSide(color: Colors.transparent, width: 1.0),
+            ),
+          ),
+          child: imageUrl.isNotEmpty
+              ? Image.network(
+                  imageUrl,
+                  fit: BoxFit.contain,
+                )
+              : Container(
+                  color: Colors.grey[300],
+                  child: const Icon(
+                    Icons.image,
+                    size: 50,
+                    color: Colors.white,
+                  ),
+                ),
+        );
+      },
     );
   }
 
